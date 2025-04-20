@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash Words | BrainSpark</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@500;600&display=swap');
+
+        :root {
+            --cream: #FFF9F0;
+            --beige: #F5E6D8;
+            --light-brown: #E8D5C0;
+            --gold: #D4AF37;
+            --coffee: #A68A64;
+            --text: #3A3226;
+            --shadow: rgba(58, 50, 38, 0.1);
+            --card-bg: rgba(255, 249, 240, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--cream);
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Элегантный фон с пузырями */
+        .bubbles-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, var(--beige), var(--cream));
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.08);
+            backdrop-filter: blur(2px);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translateY(-1000px) rotate(720deg); opacity: 0; }
+        }
+
+        /* Основные стили */
+        header {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            background: linear-gradient(to bottom, var(--cream), transparent);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .game-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--coffee);
+            margin-bottom: 0.3rem;
+        }
+
+        .game-subtitle {
+            font-size: 0.9rem;
+            color: var(--coffee);
+            font-weight: 400;
+        }
+
+        .game-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            width: 100%;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .btn {
+            background: linear-gradient(to right, var(--gold), var(--coffee));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(212, 175, 55, 0.3);
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+            max-width: 150px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .stat {
+            background: rgba(166, 138, 100, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat i {
+            color: var(--gold);
+        }
+
+        .word-display {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--coffee);
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .options-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 1.5rem;
+        }
+
+        .option-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--light-brown);
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px var(--shadow);
+            border-color: var(--gold);
+        }
+
+        .option-btn:active {
+            transform: translateY(1px);
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info-text {
+            font-size: 1.1rem;
+            color: var(--coffee);
+            font-weight: 600;
+        }
+
+        .game-description {
+            padding: 1.5rem;
+            background: var(--card-bg);
+            margin-top: auto;
+            width: 100%;
+            border-top: 1px solid var(--light-brown);
+        }
+
+        .game-description h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--coffee);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .game-description p {
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+        }
+
+        .game-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(58, 50, 38, 0.2);
+            text-align: center;
+            z-index: 100;
+            max-width: 90%;
+            width: 300px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .game-message.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .game-message h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--coffee);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .game-message p {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Анимации */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes flash {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .flash-animation {
+            animation: flash 0.5s forwards;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 400px) {
+            .word-display {
+                font-size: 1.5rem;
+                min-height: 80px;
+            }
+            
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                max-width: 100%;
+                width: 200px;
+            }
+            
+            .game-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Фон с пузырями -->
+    <div class="bubbles-bg" id="bubblesBg"></div>
+
+    <header>
+        <h1 class="game-title">Flash Words</h1>
+        <div class="game-subtitle">Тренировка скорости чтения и памяти</div>
+    </header>
+
+    <div class="game-area">
+        <div class="controls">
+            <button class="btn" id="startBtn">Начать игру</button>
+            <button class="btn" id="restartBtn">Сбросить</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <i class="fas fa-layer-group"></i>
+                <span id="levelDisplay">Уровень: 1</span>
+            </div>
+            <div class="stat">
+                <i class="fas fa-star"></i>
+                <span id="scoreDisplay">Очки: 0</span>
+            </div>
+            <div class="stat">
+                <i class="fas fa-bolt"></i>
+                <span id="speedDisplay">Скорость: 1x</span>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <p class="info-text" id="gameInfo">Нажмите "Начать игру"</p>
+        </div>
+
+        <div class="word-display" id="wordDisplay">
+            Слово появится здесь
+        </div>
+
+        <div class="options-container" id="optionsContainer">
+            <!-- Варианты ответов будут здесь -->
+        </div>
+    </div>
+
+    <div class="game-description">
+        <h3>Как играть в Flash Words?</h3>
+        <p>Слово будет появляться на очень короткое время. Вам нужно запомнить его и выбрать правильный вариант из предложенных.</p>
+        <p><strong>Применение в жизни:</strong> Развивает скорость чтения и запоминания ключевой информации.</p>
+    </div>
+
+    <div class="game-message" id="messageBox">
+        <h3 id="messageTitle">Результат</h3>
+        <p id="messageText"></p>
+        <button class="btn pulse" id="messageBtn">Продолжить</button>
+    </div>
+
+    <script>
+        // Игровая логика
+        const gameState = {
+            level: 1,
+            score: 0,
+            speed: 1,
+            currentWord: '',
+            correctAnswer: '',
+            options: [],
+            isPlaying: false,
+            wordBank: [
+                {word: "Солнце", category: "Природа"},
+                {word: "Компьютер", category: "Технологии"},
+                {word: "Гора", category: "Природа"},
+                {word: "Книга", category: "Образование"},
+                {word: "Музыка", category: "Искусство"},
+                {word: "Бег", category: "Спорт"},
+                {word: "Кофе", category: "Напитки"},
+                {word: "Самолет", category: "Транспорт"},
+                {word: "Фильм", category: "Искусство"},
+                {word: "Футбол", category: "Спорт"},
+                {word: "Яблоко", category: "Еда"},
+                {word: "Телефон", category: "Технологии"},
+                {word: "Река", category: "Природа"},
+                {word: "Журнал", category: "Образование"},
+                {word: "Картина", category: "Искусство"},
+                {word: "Чай", category: "Напитки"},
+                {word: "Поезд", category: "Транспорт"},
+                {word: "Баскетбол", category: "Спорт"},
+                {word: "Апельсин", category: "Еда"},
+                {word: "Планшет", category: "Технологии"}
+            ],
+            displayTime: 1000 // начальное время показа слова (мс)
+        };
+
+        // Элементы DOM
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const wordDisplay = document.getElementById('wordDisplay');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const levelDisplay = document.getElementById('levelDisplay');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const speedDisplay = document.getElementById('speedDisplay');
+        const gameInfo = document.getElementById('gameInfo');
+        const messageBox = document.getElementById('messageBox');
+        const messageTitle = document.getElementById('messageTitle');
+        const messageText = document.getElementById('messageText');
+        const messageBtn = document.getElementById('messageBtn');
+
+        // Создаем пузыри на фоне
+        function createBubbles() {
+            const bubblesBg = document.getElementById('bubblesBg');
+            const bubbleCount = window.innerWidth < 768 ? 20 : 40;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 60 + 20;
+                const posX = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 15 + 10;
+                
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${posX}%`;
+                bubble.style.bottom = `-${size}px`;
+                bubble.style.animationDelay = `${delay}s`;
+                bubble.style.animationDuration = `${duration}s`;
+                
+                bubblesBg.appendChild(bubble);
+            }
+        }
+
+        // Инициализация игры
+        function initGame() {
+            gameState.level = 1;
+            gameState.score = 0;
+            gameState.speed = 1;
+            gameState.displayTime = 1000;
+            gameState.isPlaying = false;
+            
+            updateUI();
+            gameInfo.textContent = 'Нажмите "Начать игру"';
+            wordDisplay.textContent = 'Слово появится здесь';
+            wordDisplay.classList.remove('flash-animation');
+            optionsContainer.innerHTML = '';
+        }
+
+        // Начало игры
+        function startGame() {
+            if (gameState.isPlaying) return;
+            
+            gameState.isPlaying = true;
+            gameState.level = 1;
+            gameState.score = 0;
+            gameState.speed = 1;
+            gameState.displayTime = 1000;
+            
+            updateUI();
+            nextRound();
+        }
+
+        // Следующий раунд
+        function nextRound() {
+            if (!gameState.isPlaying) return;
+            
+            // Выбираем случайное слово
+            const randomIndex = Math.floor(Math.random() * gameState.wordBank.length);
+            gameState.currentWord = gameState.wordBank[randomIndex].word;
+            gameState.correctAnswer = gameState.wordBank[randomIndex].category;
+            
+            // Создаем варианты ответов
+            generateOptions();
+            
+            // Показываем слово
+            showWord();
+        }
+
+        // Показать слово
+        function showWord() {
+            gameInfo.textContent = 'Внимательно смотрите на слово...';
+            wordDisplay.textContent = gameState.currentWord;
+            wordDisplay.classList.add('flash-animation');
+            
+            // Скрываем слово после заданного времени
+            setTimeout(() => {
+                wordDisplay.textContent = 'Какая была категория?';
+                wordDisplay.classList.remove('flash-animation');
+                showOptions();
+            }, gameState.displayTime);
+        }
+
+        // Показать варианты ответов
+        function showOptions() {
+            gameInfo.textContent = 'Выберите правильную категорию';
+            
+            // Очищаем контейнер
+            optionsContainer.innerHTML = '';
+            
+            // Добавляем кнопки с вариантами
+            gameState.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.addEventListener('click', () => checkAnswer(option));
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // Генерация вариантов ответов
+        function generateOptions() {
+            const categories = new Set();
+            categories.add(gameState.correctAnswer);
+            
+            // Добавляем 3 случайные категории
+            while (categories.size < 4) {
+                const randomIndex = Math.floor(Math.random() * gameState.wordBank.length);
+                categories.add(gameState.wordBank[randomIndex].category);
+            }
+            
+            // Преобразуем в массив и перемешиваем
+            gameState.options = Array.from(categories);
+            shuffleArray(gameState.options);
+        }
+
+        // Проверка ответа
+        function checkAnswer(selectedOption) {
+            if (!gameState.isPlaying) return;
+            
+            if (selectedOption === gameState.correctAnswer) {
+                // Правильный ответ
+                gameState.score += gameState.level * 10;
+                
+                // Увеличиваем сложность
+                if (gameState.score % 50 === 0) {
+                    gameState.level++;
+                    gameState.speed += 0.5;
+                    gameState.displayTime = Math.max(200, gameState.displayTime - 200);
+                }
+                
+                updateUI();
+                showMessage(
+                    'Правильно!',
+                    `+${gameState.level * 10} очков!`,
+                    'Далее'
+                );
+            } else {
+                // Неправильный ответ
+                gameState.isPlaying = false;
+                showMessage(
+                    'Ошибка',
+                    `Правильный ответ: ${gameState.correctAnswer}\nВаш счет: ${gameState.score}`,
+                    'Играть снова'
+                );
+            }
+        }
+
+        // Обновление UI
+        function updateUI() {
+            levelDisplay.textContent = `Уровень: ${gameState.level}`;
+            scoreDisplay.textContent = `Очки: ${gameState.score}`;
+            speedDisplay.textContent = `Скорость: ${gameState.speed}x`;
+        }
+
+        // Показать сообщение
+        function showMessage(title, text, btnText) {
+            messageTitle.textContent = title;
+            messageText.textContent = text;
+            messageBtn.textContent = btnText;
+            messageBox.classList.add('show');
+        }
+
+        // Скрыть сообщение
+        function hideMessage() {
+            messageBox.classList.remove('show');
+        }
+
+        // Вспомогательная функция для перемешивания массива
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            createBubbles();
+            initGame();
+            
+            // Обработчики событий
+            startBtn.addEventListener('click', startGame);
+            restartBtn.addEventListener('click', initGame);
+            
+            messageBtn.addEventListener('click', function() {
+                hideMessage();
+                if (gameState.isPlaying) {
+                    nextRound();
+                } else {
+                    startGame();
+                }
+            });
+        });
+
+        // Адаптация к изменению размера экрана
+        window.addEventListener('resize', function() {
+            document.querySelectorAll('.bubble').forEach(bubble => bubble.remove());
+            createBubbles();
+        });
+    </script>
+</body>
+</html>
